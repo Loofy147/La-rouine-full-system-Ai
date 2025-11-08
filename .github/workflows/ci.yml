@@ -65,10 +65,10 @@ jobs:
           DOMAIN_CORPUS_PATH: "data/smoke.txt"
           DOMAIN_ADAPTER_OUT: "models/ci-domain-adapter"
         run: |
-          accelerate launch --config_file accelerate_config.yaml scripts/train_domain_adapter.py
+          accelerate launch --config_file accelerate_config.yaml scripts/train_domain_adapter.py --no_fp16 --no_quant --target_modules c_attn
       - name: Run inference smoke
         env:
           BASE_MODEL: "sshleifer/tiny-gpt2"
           DOMAIN_ADAPTER_OUT: "models/ci-domain-adapter"
         run: |
-          python scripts/inference.py --prompt "Hello"
+          python scripts/inference.py --prompt "Hello" --no_quant

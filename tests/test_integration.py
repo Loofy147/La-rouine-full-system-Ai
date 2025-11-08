@@ -15,8 +15,6 @@ from transformers import (
     TrainingArguments,
 )
 
-import config
-
 
 class TestIntegration(unittest.TestCase):
     def setUp(self):

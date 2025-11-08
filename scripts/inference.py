@@ -21,6 +21,11 @@ from utils.exceptions import InferenceError, ModelLoadingError
 from utils.logger import get_logger
 from utils.model_utils import compose_adapters, load_model_and_tokenizer
 
+try:
+    import config
+except ImportError:
+    config = None
+
 logger = get_logger(__name__)
 
 
@@ -90,6 +95,31 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run inference or merge adapters.")
     parser.add_argument("--prompt", type=str, help="The prompt to run inference on.")
     parser.add_argument("--merge_path", type=str, help="Path to save the merged model.")
+    parser.add_argument(
+        "--base_model",
+        type=str,
+        default=config.MODEL_NAME if config else None,
+        help="The name of the base model to use.",
+    )
+    parser.add_argument(
+        "--tokenizer_name",
+        type=str,
+        default=config.TOKENIZER_NAME if config else None,
+        help="The name of the tokenizer to use.",
+    )
+    parser.add_argument(
+        "--domain_adapter_path",
+        type=str,
+        default=config.DOMAIN_ADAPTER_OUTPUT_DIR if config else None,
+        help="The path to the domain adapter.",
+    )
+    parser.add_argument(
+        "--task_adapter_path",
+        type=str,
+        default=config.TASK_ADAPTER_OUTPUT_DIR if config else None,
+        help="The path to the task adapter.",
+    )
+    parser.add_argument("--no_quant", action="store_true", help="Disable quantization.")
     args = parser.parse_args()
 
     if not args.prompt and not args.merge_path:
@@ -98,8 +128,12 @@ def main() -> None:
 
     try:
         logger.info("Starting inference script...")
-        model, tokenizer = load_model_and_tokenizer()
-        model = compose_adapters(model)
+        model, tokenizer = load_model_and_tokenizer(
+            args.base_model, args.tokenizer_name, args.no_quant
+        )
+        model = compose_adapters(
+            model, args.domain_adapter_path, args.task_adapter_path
+        )
 
         if args.prompt:
             run_inference(args.prompt, model, tokenizer)

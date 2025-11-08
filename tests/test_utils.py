@@ -42,7 +42,7 @@ class TestUtils(unittest.TestCase):
         mock_model_from_pretrained.return_value = MagicMock()
         mock_tokenizer_from_pretrained.return_value = MagicMock()
 
-        model, tokenizer = load_model_and_tokenizer()
+        model, tokenizer = load_model_and_tokenizer("test_model", "test_tokenizer", True)
 
         self.assertIsNotNone(model)
         self.assertIsNotNone(tokenizer)
@@ -57,7 +57,7 @@ class TestUtils(unittest.TestCase):
         mock_base_model = MagicMock()
         mock_peft_model.from_pretrained.return_value = MagicMock()
 
-        composed_model = compose_adapters(mock_base_model)
+        composed_model = compose_adapters(mock_base_model, "domain", "task")
 
         self.assertIsNotNone(composed_model)
         mock_peft_model.from_pretrained.assert_called_once()

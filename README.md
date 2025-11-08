@@ -129,3 +129,15 @@ black .
 # Lint the code and automatically fix issues
 ruff check --fix .
 ```
+
+This project also uses `pre-commit` to automate this process. After installing the development dependencies, you can install the hooks with:
+
+```bash
+pre-commit install
+```
+
+If you have issues with `core.hooksPath`, you can run the hooks manually with:
+
+```bash
+pre-commit run --all-files
+```

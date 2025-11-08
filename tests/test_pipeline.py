@@ -7,7 +7,6 @@ from unittest.mock import MagicMock, patch
 from transformers import AutoTokenizer
 
 import config
-from utils.logger import get_logger
 
 
 class TestPipeline(unittest.TestCase):
