@@ -94,14 +94,20 @@ python scripts/benchmark.py
 
 ### 6. Run Verification Suite
 
-To run the full verification suite, including unit and integration tests, use the following commands:
+To run the full verification suite, including unit and integration tests, use the following command:
 
 ```bash
-# Run unit tests
-python -m unittest tests/test_pipeline.py
-
-# Run integration tests (optional)
-RUN_INTEGRATION_TESTS=true python -m unittest tests/test_integration.py
+python -m unittest discover tests
 ```
 
-**Note on Integration Tests:** The integration test (`tests/test_integration.py`) performs a full, end-to-end run of the training and inference pipeline on a tiny dataset. By default, this test is skipped to allow for rapid verification of the core components. Due to a potential upstream issue with the `MiniMaxAI/MiniMax-M2` model's custom code, this test may fail. It is included for completeness and can be run by setting the `RUN_INTEGRATION_TESTS` environment variable as shown above.
+## Development Workflow
+
+This project uses `black` for code formatting and `ruff` for linting. To ensure your contributions are well-formatted and free of linting errors, please run the following commands before submitting a pull request:
+
+```bash
+# Format the code
+black .
+
+# Lint the code and automatically fix issues
+ruff check --fix .
+```
