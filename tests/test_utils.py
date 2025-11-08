@@ -1,6 +1,9 @@
 # tests/test_utils.py
+import os
 import unittest
 from unittest.mock import MagicMock, patch
+
+from peft import PeftModel
 
 from utils.exceptions import (
     DataPreparationError,
@@ -49,19 +52,39 @@ class TestUtils(unittest.TestCase):
         mock_model_from_pretrained.assert_called_once()
         mock_tokenizer_from_pretrained.assert_called_once()
 
-    @patch("utils.model_utils.PeftModel")
-    def test_compose_adapters(self, mock_peft_model):
+    @patch("peft.PeftModel.from_pretrained")
+    @patch("os.path.exists", return_value=True)
+    def test_compose_adapters(self, mock_exists, mock_from_pretrained):
         """
         Tests that the adapters are composed correctly.
         """
         mock_base_model = MagicMock()
-        mock_peft_model.from_pretrained.return_value = MagicMock()
+        mock_peft_model = MagicMock()
+        mock_from_pretrained.return_value = mock_peft_model
 
         composed_model = compose_adapters(mock_base_model, "domain", "task")
 
         self.assertIsNotNone(composed_model)
-        mock_peft_model.from_pretrained.assert_called_once()
-        composed_model.load_adapter.assert_called_once()
+        mock_from_pretrained.assert_called_once_with(
+            mock_base_model, "domain", adapter_name="domain_adapter"
+        )
+        mock_peft_model.load_adapter.assert_called_once_with(
+            "task", adapter_name="task_adapter"
+        )
+
+    @patch("peft.PeftModel.from_pretrained")
+    @patch("os.path.exists", return_value=False)
+    def test_compose_adapters_fallback(self, mock_exists, mock_from_pretrained):
+        """
+        Tests that the adapter composition falls back gracefully.
+        """
+        mock_base_model = MagicMock()
+        mock_from_pretrained.return_value = MagicMock()
+
+        composed_model = compose_adapters(mock_base_model, "domain", "task")
+
+        self.assertIsNotNone(composed_model)
+        mock_from_pretrained.assert_not_called()
 
 
 if __name__ == "__main__":

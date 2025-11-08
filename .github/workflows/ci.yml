@@ -59,6 +59,8 @@ jobs:
           mkdir -p data
           echo "This is a test sentence." > data/smoke.txt
           echo "This is another test sentence." >> data/smoke.txt
+          echo '{"context":"Hello","question":"what is your name?","answer":"Hi"}' > data/smoke_task.jsonl
+          echo '{"context":"Sum 1+1","question":"what is the sum?","answer":"2"}' >> data/smoke_task.jsonl
       - name: Run domain adapter smoke (tiny model)
         env:
           BASE_MODEL: "sshleifer/tiny-gpt2"
@@ -66,9 +68,17 @@ jobs:
           DOMAIN_ADAPTER_OUT: "models/ci-domain-adapter"
         run: |
           accelerate launch --config_file accelerate_config.yaml scripts/train_domain_adapter.py --no_fp16 --no_quant --target_modules c_attn
+      - name: Run task adapter smoke (tiny model)
+        env:
+          BASE_MODEL: "sshleifer/tiny-gpt2"
+          TASK_DATA_PATH: "data/smoke_task.jsonl"
+          TASK_ADAPTER_OUT: "models/ci-task-adapter"
+        run: |
+          accelerate launch --config_file accelerate_config.yaml scripts/train_task_adapter.py --no_fp16 --no_quant --target_modules c_attn
       - name: Run inference smoke
         env:
           BASE_MODEL: "sshleifer/tiny-gpt2"
           DOMAIN_ADAPTER_OUT: "models/ci-domain-adapter"
+          TASK_ADAPTER_OUT: "models/ci-task-adapter"
         run: |
           python scripts/inference.py --prompt "Hello" --no_quant

@@ -2,6 +2,8 @@
 """
 Utility functions for model loading and adapter composition.
 """
+import os
+
 import torch
 from peft import PeftModel
 from transformers import (
@@ -70,10 +72,24 @@ def compose_adapters(
     Returns:
         The composed PeftModel.
     """
-    model = PeftModel.from_pretrained(
-        model, domain_adapter_path, adapter_name="domain_adapter"
-    )
-    logger.info("Domain adapter loaded.")
-    model.load_adapter(task_adapter_path, adapter_name="task_adapter")
-    logger.info("Task adapter loaded and composed.")
+    if os.path.exists(domain_adapter_path):
+        model = PeftModel.from_pretrained(
+            model, domain_adapter_path, adapter_name="domain_adapter"
+        )
+        logger.info("Domain adapter loaded.")
+
+        if os.path.exists(task_adapter_path):
+            model.load_adapter(task_adapter_path, adapter_name="task_adapter")
+            logger.info("Task adapter loaded and composed.")
+        else:
+            logger.warning(f"Task adapter not found at {task_adapter_path}. Skipping.")
+
+    elif os.path.exists(task_adapter_path):
+        model = PeftModel.from_pretrained(
+            model, task_adapter_path, adapter_name="task_adapter"
+        )
+        logger.info("Task adapter loaded.")
+    else:
+        logger.warning("No adapters found. Using base model only.")
+
     return model

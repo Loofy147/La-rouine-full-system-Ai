@@ -112,11 +112,19 @@ This will save a new model to the specified path, which can then be deployed wit
 
 ### Canary Rollouts
 
-A safe deployment strategy is to use a canary rollout, where the new model is gradually exposed to a small percentage of traffic. For example:
+A safe deployment strategy is to use a canary rollout, where the new model is gradually exposed to a small percentage of traffic. This can be implemented at the infrastructure level (e.g., with a load balancer or a service mesh).
 
--   **1% Traffic:** Deploy the merged model and route 1% of traffic to it, monitoring for any increase in errors or latency.
--   **10% Traffic:** If the 1% rollout is stable, increase the traffic to 10%.
--   **100% Traffic:** Once the model has been validated at 10%, roll it out to all traffic.
+A typical canary rollout process would look like this:
+
+1.  **Deploy the new model** alongside the existing production model.
+2.  **Route a small percentage of traffic (e.g., 1%)** to the new model.
+3.  **Monitor key metrics** for the new model, such as:
+    *   Error rate
+    *   Latency
+    *   Output quality (e.g., through human evaluation or automated checks)
+4.  **Gradually increase the traffic** to the new model (e.g., to 10%, then 50%) as confidence in its stability and performance grows.
+5.  **Roll back immediately** if any of the key metrics degrade significantly.
+6.  **Route 100% of traffic** to the new model once it has been fully validated.
 
 ## Development Workflow
 

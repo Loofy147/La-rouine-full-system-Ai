@@ -3,6 +3,7 @@
 import json
 import os
 import shutil
+import tempfile
 import unittest
 
 import torch
@@ -21,6 +22,7 @@ class TestIntegration(unittest.TestCase):
         """
         Set up a tiny dataset and configuration for the integration test.
         """
+        self.test_dir = tempfile.mkdtemp()
         self.model_name = "sshleifer/tiny-gpt2"
         self.tokenizer_name = "sshleifer/tiny-gpt2"
         self.dapt_lora_config = {
@@ -56,9 +58,8 @@ class TestIntegration(unittest.TestCase):
         ]
 
         # Create temporary data files
-        os.makedirs("data/tiny_test", exist_ok=True)
-        self.domain_corpus_path = "data/tiny_test/domain_corpus.txt"
-        self.task_data_path = "data/tiny_test/task_data.json"
+        self.domain_corpus_path = os.path.join(self.test_dir, "domain_corpus.txt")
+        self.task_data_path = os.path.join(self.test_dir, "task_data.json")
 
         with open(self.domain_corpus_path, "w") as f:
             f.write(self.tiny_domain_corpus)
@@ -66,8 +67,8 @@ class TestIntegration(unittest.TestCase):
         with open(self.task_data_path, "w") as f:
             json.dump(self.tiny_task_data, f)
 
-        self.domain_adapter_output_dir = "models/tiny_test/dapt"
-        self.task_adapter_output_dir = "models/tiny_test/sft"
+        self.domain_adapter_output_dir = os.path.join(self.test_dir, "dapt")
+        self.task_adapter_output_dir = os.path.join(self.test_dir, "sft")
 
     def test_end_to_end_pipeline(self):
         """
@@ -162,12 +163,9 @@ class TestIntegration(unittest.TestCase):
 
     def tearDown(self):
         """
-        Clean up the temporary data and model files.
+        Clean up the temporary directory.
         """
-        if os.path.exists("data/tiny_test"):
-            shutil.rmtree("data/tiny_test")
-        if os.path.exists("models/tiny_test"):
-            shutil.rmtree("models/tiny_test")
+        shutil.rmtree(self.test_dir)
 
 
 if __name__ == "__main__":
