@@ -61,23 +61,32 @@ python scripts/prepare_data.py
 
 ### 4. Train the Adapters
 
-To train the domain and task adapters, run the following commands in a GPU environment:
+To train the domain and task adapters, use `accelerate` for distributed training. First, configure `accelerate` for your environment:
+
+```bash
+accelerate config
+```
+
+Then, launch the training scripts:
 
 ```bash
 # Train the domain adapter
-python scripts/train_domain_adapter.py
+accelerate launch scripts/train_domain_adapter.py
 
 # Train the task adapter
-python scripts/train_task_adapter.py
+accelerate launch scripts/train_task_adapter.py
 ```
 
 ### 5. Run Inference and Benchmarking
 
-To run inference or benchmark the performance, use the following scripts:
+The inference script can be run with a custom prompt or be used to merge the adapters into a single model.
 
 ```bash
-# Run a sample inference
-python scripts/inference.py
+# Run a sample inference with a custom prompt
+python scripts/inference.py --prompt "Your prompt here"
+
+# Merge the adapters and save the new model
+python scripts/inference.py --merge_path "models/merged_model"
 
 # Run the performance benchmark
 python scripts/benchmark.py
