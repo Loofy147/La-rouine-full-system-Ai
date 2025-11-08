@@ -22,7 +22,7 @@ BNB_CONFIG = {
     "load_in_4bit": True,
     "bnb_4bit_quant_type": "nf4",
     "bnb_4bit_use_double_quant": True,
-    "bnb_4bit_compute_dtype": "torch.bfloat16" # Note: This will be converted to a torch dtype in the scripts
+    "bnb_4bit_compute_dtype": "torch.bfloat16",  # Note: This will be converted to a torch dtype in the scripts
 }
 
 # --- Domain Adapter (DAPT) LoRA Configuration ---
@@ -32,7 +32,7 @@ DAPT_LORA_CONFIG = {
     "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "w1", "w2", "w3"],
     "lora_dropout": 0.05,
     "bias": "none",
-    "task_type": "CAUSAL_LM"
+    "task_type": "CAUSAL_LM",
 }
 
 # --- Task Adapter (SFT) LoRA Configuration ---
@@ -42,7 +42,7 @@ SFT_LORA_CONFIG = {
     "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "w1", "w2", "w3"],
     "lora_dropout": 0.1,
     "bias": "none",
-    "task_type": "CAUSAL_LM"
+    "task_type": "CAUSAL_LM",
 }
 
 # --- Domain Adapter (DAPT) Training Arguments ---
@@ -53,7 +53,7 @@ DAPT_TRAINING_ARGS = {
     "learning_rate": 1e-4,
     "save_steps": 1000,
     "logging_steps": 100,
-    "fp16": True
+    "fp16": True,
 }
 
 # --- Task Adapter (SFT) Training Arguments ---
@@ -64,5 +64,5 @@ SFT_TRAINING_ARGS = {
     "learning_rate": 2e-4,
     "save_steps": 500,
     "logging_steps": 50,
-    "fp16": True
+    "fp16": True,
 }

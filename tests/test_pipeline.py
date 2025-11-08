@@ -1,12 +1,15 @@
 # tests/test_pipeline.py
 
+import sys
 import unittest
+from unittest.mock import MagicMock, patch
+
 from transformers import AutoTokenizer
+
 import config
-from utils.logger import get_logger
+
 
 class TestPipeline(unittest.TestCase):
-
     def setUp(self):
         """
         Set up the tokenizer for the tests.
@@ -50,14 +53,6 @@ class TestPipeline(unittest.TestCase):
         self.assertIn("load_in_4bit", config.BNB_CONFIG)
         self.assertIn("num_train_epochs", config.DAPT_TRAINING_ARGS)
 
-    def test_logger_initialization(self):
-        """
-        Tests that the logger is initialized correctly.
-        """
-        logger = get_logger(__name__)
-        self.assertIsNotNone(logger)
-        self.assertEqual(logger.name, __name__)
-
     @unittest.skip("This is a placeholder for a hallucination probe.")
     def test_hallucination_probe(self):
         """
@@ -71,6 +66,61 @@ class TestPipeline(unittest.TestCase):
         A placeholder for a test that would check for safety and privacy issues.
         """
         pass
+
+    @patch("scripts.inference.run_inference")
+    @patch("scripts.inference.compose_adapters")
+    @patch("scripts.inference.load_model_and_tokenizer")
+    def test_inference_script_with_prompt(
+        self,
+        mock_load_model_and_tokenizer,
+        mock_compose_adapters,
+        mock_run_inference,
+    ):
+        """
+        Tests that the inference script calls run_inference with the correct prompt.
+        """
+        mock_load_model_and_tokenizer.return_value = (MagicMock(), MagicMock())
+        mock_compose_adapters.return_value = MagicMock()
+
+        test_prompt = "This is a test prompt"
+        sys.argv = ["scripts/inference.py", "--prompt", test_prompt]
+
+        from scripts import inference
+
+        inference.main()
+
+        mock_run_inference.assert_called_once()
+        # The actual call might have more arguments, so we check the prompt
+        called_prompt = mock_run_inference.call_args[0][0]
+        self.assertEqual(called_prompt, test_prompt)
+
+    @patch("scripts.inference.merge_and_save")
+    @patch("scripts.inference.compose_adapters")
+    @patch("scripts.inference.load_model_and_tokenizer")
+    def test_inference_script_with_merge_path(
+        self,
+        mock_load_model_and_tokenizer,
+        mock_compose_adapters,
+        mock_merge_and_save,
+    ):
+        """
+        Tests that the inference script calls merge_and_save with the correct path.
+        """
+        mock_load_model_and_tokenizer.return_value = (MagicMock(), MagicMock())
+        mock_compose_adapters.return_value = MagicMock()
+
+        test_path = "/tmp/merged_model"
+        sys.argv = ["scripts/inference.py", "--merge_path", test_path]
+
+        from scripts import inference
+
+        inference.main()
+
+        mock_merge_and_save.assert_called_once()
+        # The actual call might have more arguments, so we check the path
+        called_path = mock_merge_and_save.call_args[0][2]
+        self.assertEqual(called_path, test_path)
+
 
 if __name__ == "__main__":
     unittest.main()

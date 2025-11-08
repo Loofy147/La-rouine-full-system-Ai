@@ -61,23 +61,32 @@ python scripts/prepare_data.py
 
 ### 4. Train the Adapters
 
-To train the domain and task adapters, run the following commands in a GPU environment:
+To train the domain and task adapters, use `accelerate` for distributed training. First, configure `accelerate` for your environment:
+
+```bash
+accelerate config
+```
+
+Then, launch the training scripts:
 
 ```bash
 # Train the domain adapter
-python scripts/train_domain_adapter.py
+accelerate launch scripts/train_domain_adapter.py
 
 # Train the task adapter
-python scripts/train_task_adapter.py
+accelerate launch scripts/train_task_adapter.py
 ```
 
 ### 5. Run Inference and Benchmarking
 
-To run inference or benchmark the performance, use the following scripts:
+The inference script can be run with a custom prompt or be used to merge the adapters into a single model.
 
 ```bash
-# Run a sample inference
-python scripts/inference.py
+# Run a sample inference with a custom prompt
+python scripts/inference.py --prompt "Your prompt here"
+
+# Merge the adapters and save the new model
+python scripts/inference.py --merge_path "models/merged_model"
 
 # Run the performance benchmark
 python scripts/benchmark.py
@@ -85,14 +94,58 @@ python scripts/benchmark.py
 
 ### 6. Run Verification Suite
 
-To run the full verification suite, including unit and integration tests, use the following commands:
+To run the full verification suite, including unit and integration tests, use the following command:
 
 ```bash
-# Run unit tests
-python -m unittest tests/test_pipeline.py
-
-# Run integration tests (optional)
-RUN_INTEGRATION_TESTS=true python -m unittest tests/test_integration.py
+python -m unittest discover tests
 ```
 
-**Note on Integration Tests:** The integration test (`tests/test_integration.py`) performs a full, end-to-end run of the training and inference pipeline on a tiny dataset. By default, this test is skipped to allow for rapid verification of the core components. Due to a potential upstream issue with the `MiniMaxAI/MiniMax-M2` model's custom code, this test may fail. It is included for completeness and can be run by setting the `RUN_INTEGRATION_TESTS` environment variable as shown above.
+## Deploying the Model
+
+For production deployment, it is recommended to merge the adapters into the base model to create a standalone, optimized model. This can be done using the `inference.py` script:
+
+```bash
+python scripts/inference.py --merge_path "models/merged_model"
+```
+
+This will save a new model to the specified path, which can then be deployed without requiring the `peft` library for inference.
+
+### Canary Rollouts
+
+A safe deployment strategy is to use a canary rollout, where the new model is gradually exposed to a small percentage of traffic. This can be implemented at the infrastructure level (e.g., with a load balancer or a service mesh).
+
+A typical canary rollout process would look like this:
+
+1.  **Deploy the new model** alongside the existing production model.
+2.  **Route a small percentage of traffic (e.g., 1%)** to the new model.
+3.  **Monitor key metrics** for the new model, such as:
+    *   Error rate
+    *   Latency
+    *   Output quality (e.g., through human evaluation or automated checks)
+4.  **Gradually increase the traffic** to the new model (e.g., to 10%, then 50%) as confidence in its stability and performance grows.
+5.  **Roll back immediately** if any of the key metrics degrade significantly.
+6.  **Route 100% of traffic** to the new model once it has been fully validated.
+
+## Development Workflow
+
+This project uses `black` for code formatting and `ruff` for linting. To ensure your contributions are well-formatted and free of linting errors, please run the following commands before submitting a pull request:
+
+```bash
+# Format the code
+black .
+
+# Lint the code and automatically fix issues
+ruff check --fix .
+```
+
+This project also uses `pre-commit` to automate this process. After installing the development dependencies, you can install the hooks with:
+
+```bash
+pre-commit install
+```
+
+If you have issues with `core.hooksPath`, you can run the hooks manually with:
+
+```bash
+pre-commit run --all-files
+```
