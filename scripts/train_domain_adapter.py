@@ -7,7 +7,7 @@ def train_domain_adapter():
     """
     Trains a domain adapter on the unlabeled domain corpus using QLoRA.
     """
-    model_name = "gpt2"
+    model_name = "MiniMaxAI/MiniMax-M2"
     domain_corpus_path = "data/domain_corpus/domain_corpus.txt"
     output_dir = "models/domain_adapter"
 
@@ -31,7 +31,7 @@ def train_domain_adapter():
     lora_config = LoraConfig(
         r=8,
         lora_alpha=32,
-        target_modules=["c_attn"],
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "w1", "w2", "w3"],
         lora_dropout=0.05,
         bias="none",
         task_type="CAUSAL_LM"

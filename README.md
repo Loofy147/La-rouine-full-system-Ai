@@ -1,6 +1,6 @@
 # Modular Fine-Tuning with Domain and Task Adapters
 
-This project provides a complete, runnable recipe for fine-tuning large language models using a modular, adapter-based approach. It follows the methodology of first training a domain adapter on an unlabeled corpus (Domain-Adaptive Pretraining or DAPT) and then training separate task adapters on labeled datasets (Parameter-Efficient Fine-Tuning or PEFT). This approach is modular, cost-effective, and easy to iterate on.
+This project provides a complete, runnable recipe for fine-tuning large language models using a modular, adapter-based approach. It follows the methodology of first training a domain adapter on an unlabeled corpus (Domain-Adaptive Pretraining or DAPT) and then training separate task adapters on labeled datasets (Parameter-Efficient Fine-Tuning or PEFT). This implementation uses the powerful `MiniMaxAI/MiniMax-M2` model. This approach is modular, cost-effective, and easy to iterate on.
 
 ## Methodology
 

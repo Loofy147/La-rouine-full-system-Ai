@@ -7,7 +7,7 @@ class TestPipeline(unittest.TestCase):
         """
         Set up the tokenizer for the tests.
         """
-        self.model_name = "gpt2"
+        self.model_name = "MiniMaxAI/MiniMax-M2"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
 
     def test_tokenizer_not_none(self):

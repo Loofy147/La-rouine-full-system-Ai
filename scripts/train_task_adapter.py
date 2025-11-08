@@ -8,7 +8,7 @@ def train_task_adapter():
     """
     Trains a task adapter on the labeled task dataset using QLoRA.
     """
-    model_name = "gpt2"
+    model_name = "MiniMaxAI/MiniMax-M2"
     task_data_path = "data/task_data/task_data.json"
     output_dir = "models/task_adapter"
 
@@ -33,7 +33,7 @@ def train_task_adapter():
     lora_config = LoraConfig(
         r=16,
         lora_alpha=32,
-        target_modules=["c_attn"],
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "w1", "w2", "w3"],
         lora_dropout=0.1,
         bias="none",
         task_type="CAUSAL_LM"

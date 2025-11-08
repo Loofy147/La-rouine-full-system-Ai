@@ -7,7 +7,7 @@ def run_inference():
     Loads the base model, composes the domain and task adapters,
     and runs inference on a sample prompt.
     """
-    model_name = "gpt2"
+    model_name = "MiniMaxAI/MiniMax-M2"
     domain_adapter_path = "models/domain_adapter"
     task_adapter_path = "models/task_adapter"
 

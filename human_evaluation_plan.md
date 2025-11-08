@@ -6,7 +6,7 @@ This document outlines a plan for the human evaluation of the fine-tuned models.
 
 We will conduct a blind A/B/C comparison of the following three model versions:
 
-1.  **Model A:** The base `gpt2` model.
+1.  **Model A:** The base `MiniMaxAI/MiniMax-M2` model.
 2.  **Model B:** The base model + the domain adapter.
 3.  **Model C:** The base model + the domain adapter + the task adapter.
 

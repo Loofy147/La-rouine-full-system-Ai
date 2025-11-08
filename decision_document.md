@@ -4,9 +4,9 @@ This document outlines the decisions made for implementing a modular fine-tuning
 
 ## 1. Base Model and Tokenizer
 
-*   **Base Model:** `gpt2`
-    *   **Reasoning:** To ensure the project is runnable without requiring special access or authentication, the `gpt2` model is used as the base. It is a well-understood, open-source causal language model that is suitable for demonstrating the adapter-based fine-tuning workflow. The principles demonstrated here can be directly applied to more advanced, gated models like Llama-2.
-*   **Tokenizer:** The default `gpt2` tokenizer will be used.
+*   **Base Model:** `MiniMaxAI/MiniMax-M2`
+    *   **Reasoning:** This is a powerful, open-source Mixture-of-Experts (MoE) model with strong performance in coding and agentic tasks. It is a suitable choice for demonstrating the adapter-based fine-tuning workflow on a modern, high-performance architecture.
+*   **Tokenizer:** The default `MiniMaxAI/MiniMax-M2` tokenizer will be used.
     *   **Reasoning:** For this initial implementation, we will assume the domain-specific vocabulary is sufficiently covered by the base model's tokenizer. If significant out-of-vocabulary tokens are discovered during data analysis, we will revisit the decision and consider tokenizer extension.
 
 ## 2. Data Strategy
