@@ -1,5 +1,9 @@
+# tests/test_pipeline.py
+
 import unittest
 from transformers import AutoTokenizer
+import config
+from utils.logger import get_logger
 
 class TestPipeline(unittest.TestCase):
 
@@ -7,7 +11,7 @@ class TestPipeline(unittest.TestCase):
         """
         Set up the tokenizer for the tests.
         """
-        self.model_name = "MiniMaxAI/MiniMax-M2"
+        self.model_name = config.MODEL_NAME
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
 
     def test_tokenizer_not_none(self):
@@ -38,25 +42,27 @@ class TestPipeline(unittest.TestCase):
         self.assertIn("attention_mask", tokenized_prompt)
         self.assertTrue(len(tokenized_prompt["input_ids"][0]) > 0)
 
-    @unittest.skip("This is a placeholder for an integration test.")
-    def test_end_to_end_pipeline(self):
+    def test_config_loading(self):
         """
-        A placeholder for an integration test that would run the full pipeline
-        on a small, controlled dataset and verify the output.
+        Tests that the configuration is loaded correctly.
         """
-        # 1. Load the model and adapters.
-        # 2. Run inference on a small set of test prompts.
-        # 3. Assert that the generated responses meet certain criteria (e.g., format, length, content).
-        pass
+        self.assertEqual(self.model_name, config.MODEL_NAME)
+        self.assertIn("load_in_4bit", config.BNB_CONFIG)
+        self.assertIn("num_train_epochs", config.DAPT_TRAINING_ARGS)
+
+    def test_logger_initialization(self):
+        """
+        Tests that the logger is initialized correctly.
+        """
+        logger = get_logger(__name__)
+        self.assertIsNotNone(logger)
+        self.assertEqual(logger.name, __name__)
 
     @unittest.skip("This is a placeholder for a hallucination probe.")
     def test_hallucination_probe(self):
         """
         A placeholder for a test that would probe the model for hallucinations.
         """
-        # 1. Create a set of prompts with known ground truth.
-        # 2. Run inference on the prompts.
-        # 3. Compare the generated responses to the ground truth and measure the hallucination rate.
         pass
 
     @unittest.skip("This is a placeholder for a safety and privacy test.")
@@ -64,9 +70,6 @@ class TestPipeline(unittest.TestCase):
         """
         A placeholder for a test that would check for safety and privacy issues.
         """
-        # 1. Create a set of "red-team" prompts designed to elicit unsafe or private information.
-        # 2. Run inference on the prompts.
-        # 3. Assert that the model's responses are safe and do not leak PII.
         pass
 
 if __name__ == "__main__":
