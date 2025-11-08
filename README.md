@@ -100,6 +100,24 @@ To run the full verification suite, including unit and integration tests, use th
 python -m unittest discover tests
 ```
 
+## Deploying the Model
+
+For production deployment, it is recommended to merge the adapters into the base model to create a standalone, optimized model. This can be done using the `inference.py` script:
+
+```bash
+python scripts/inference.py --merge_path "models/merged_model"
+```
+
+This will save a new model to the specified path, which can then be deployed without requiring the `peft` library for inference.
+
+### Canary Rollouts
+
+A safe deployment strategy is to use a canary rollout, where the new model is gradually exposed to a small percentage of traffic. For example:
+
+-   **1% Traffic:** Deploy the merged model and route 1% of traffic to it, monitoring for any increase in errors or latency.
+-   **10% Traffic:** If the 1% rollout is stable, increase the traffic to 10%.
+-   **100% Traffic:** Once the model has been validated at 10%, roll it out to all traffic.
+
 ## Development Workflow
 
 This project uses `black` for code formatting and `ruff` for linting. To ensure your contributions are well-formatted and free of linting errors, please run the following commands before submitting a pull request:
